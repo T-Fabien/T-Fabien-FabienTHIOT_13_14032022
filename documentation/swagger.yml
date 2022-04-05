@@ -1,0 +1,226 @@
+swagger: '2.0'
+info:
+  title: Bank Argent API documentation
+  description: Contains all available API endpoints in this codebase for account 
+  version: '1.0.0'
+host: localhost:3001
+basePath: /api/v1
+schemes:
+  - http
+paths : 
+  /user/profile/{accountId}: 
+
+      security : 
+        - Bearer : []
+      tags :     get : 
+        - Account details
+      summary : Find account's last transactions
+      description : API for fetching last transactions
+      parameters :
+        - in : header
+          type : string
+          name: Authorization 
+          description : Attach Bearer JWT Token
+          required : true 
+        - name: accountId
+          in: path
+          description: Id of account
+          required: true
+          type: string
+        - name : period
+          in : body
+          required: true
+          description : Current Month  
+          schema:
+            $ref: '#/definitions/TransactionsPeriod'
+      produces : 
+        - application/json 
+      responses : 
+        '200' : 
+          description : Successfully
+          schema:
+            $ref: '#/definitions/LastTransactions'
+        '400':
+          description: Invalid Fields
+        '401':
+          description: Invalid Token
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+
+  /user/{accountId}/{transactionId}: 
+    get : 
+      security : 
+        - Bearer : []
+      tags : 
+        - Transaction details
+      summary : Find  transaction by Id
+      description : API for fetching one transaction details
+      parameters :
+        - in : header
+          type : string
+          name: Authorization 
+          description : Attach Bearer JWT Token
+          required : true 
+        - name: accountId
+          in: path
+          description: Id of account
+          required: true
+          type: string
+        - name: transactionId
+          in: path
+          description: Id of transaction
+          required: true
+          type: string
+
+      produces : 
+        - application/json 
+      responses : 
+        '200' : 
+          description : Successfully
+          schema:
+            $ref: '#/definitions/Transaction'
+        '400':
+          description: Invalid Fields
+        '401':
+          description: Invalid Token
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    put : 
+      security : 
+        - Bearer : []
+      tags : 
+        - Change transaction 
+      summary : Modify transaction details
+      description : API for change transaction details
+      parameters :
+        - in : header
+          type : string
+          name: Authorization 
+          description : Attach Bearer JWT Token
+          required : true 
+        - name: accountId
+          in: path
+          description: Id of account
+          required: true
+          type: string
+        - name: transactionId
+          in: path
+          description: Id of transaction
+          required: true
+          type: string
+        - in: body
+          name: body
+          description: Update transaction attributes
+          required: true
+          schema:
+            $ref: '#/definitions/TransactionChange'
+      produces : 
+        - application/json 
+      responses : 
+        '200' : 
+          description : Transaction's modified
+          schema:
+            $ref: '#/definitions/Transaction'
+        '400':
+          description: Invalid Fields
+        '401':
+          description: Invalid Token
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
+definitions:
+  TransactionsPeriod:
+    type: object
+    properties:
+      from:
+        type: string
+        format: date
+        description: start date (30days before)
+        example: '2022-01-01'
+      to:
+        type: string
+        format: date
+        description: end date (today)
+        example: '2022-02-01'
+  LastTransactions : 
+    type: object
+    properties:
+      TransactionId : 
+        type : string 
+        description : account's id 
+        example : "2357644"
+      Date : 
+        type : string
+        format : data
+        example : "2022-01-20"
+        description : transaction's date
+      Description : 
+        type : string
+        description : transaction's description
+        example : "Golden Sun Bakery"
+      Amount : 
+        type : number
+        description : transaction's amount
+        example : 2567
+      Balance : 
+        type : number 
+        description : transaction's balance 
+        example : 145
+  Transaction : 
+    type: object
+    properties:
+      TransactionId : 
+        type : string 
+        description : transaction's id 
+        example : "2357644"
+      Date : 
+        type : string
+        description : transaction's date
+        example : "20-12-2021"
+      Description : 
+        type : string
+        description : transaction's description 
+        example : "Golden Sun Bakery"
+      Amount : 
+        type : integer
+        description : transaction's amount 
+        example: 5.65
+      Balance : 
+        type : integer 
+        description : transaction's balance 
+        example : 2037.37
+      Transaction type : 
+        type : string 
+        description : transaction's type 
+        example : "Electronic"
+      Category : 
+        type : string 
+        description : transaction's category
+        example : "Food"
+      Note : 
+        type : string 
+        description : transaction's note 
+        example : "Lunch for two"
+  TransactionChange :
+    type: object
+    properties:
+      Category : 
+        type : string 
+        description : transaction's category
+        example : "Home"
+      Note : 
+        type : string 
+        description : transaction's note 
+        example : "Ikea"
+  
