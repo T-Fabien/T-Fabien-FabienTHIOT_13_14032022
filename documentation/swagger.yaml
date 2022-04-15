@@ -4,15 +4,14 @@ info:
   description: Contains all available API endpoints in this codebase for account 
   version: '1.0.0'
 host: localhost:3001
-basePath: /api/v1
 schemes:
   - http
 paths : 
-  /user/profile/{accountId}: 
-
+  /api/v1/user/profile/{accountId}/transactions:
+    get :  
       security : 
         - Bearer : []
-      tags :     get : 
+      tags :     
         - Account details
       summary : Find account's last transactions
       description : API for fetching last transactions
@@ -49,7 +48,41 @@ paths :
         '500':
           description: Internal Server Error
 
-  /user/{accountId}/{transactionId}: 
+  /api/v1/user/profile/{accountId}/transactions/{transactionId}:
+    post:
+      security:
+        - Bearer: []
+      tags:
+        - Transactions
+      summary: User transaction API
+      description: API for fetching a single user's transaction
+      parameters:
+        - in: path
+          name: transactionId
+          description: ID of transaction
+          required: true
+          type: string
+        - in: path
+          name: accountId
+          description: Id of account
+          required: true
+          type: string
+        - in: header
+          name: Authorization
+          description: Attach Bearer JWT token
+          required: true
+          type: string
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Transaction retrieved successfully
+          schema:
+            $ref: '#/definitions/TransactionResponse'
+        '400':
+          description: Invalid Fields
+        '500':
+          description: Internal Server Error
     get : 
       security : 
         - Bearer : []
@@ -133,7 +166,6 @@ paths :
           description: Not Found
         '500':
           description: Internal Server Error
-
 securityDefinitions:
   Bearer:
     type: apiKey
@@ -212,6 +244,40 @@ definitions:
         type : string 
         description : transaction's note 
         example : "Lunch for two"
+  TransactionResponse:
+    type: object
+    properties:
+      status:
+        type: integer
+      message:
+        type: string
+      body:
+        type: object
+        properties:
+          id:
+            type: string
+          userId:
+            type: string
+          account:
+            type: string
+            enum:
+            - Checking
+            - Savings
+            - Credit Card
+          date:
+            type: string
+            format : date-time
+          entitled:
+            type: string
+          amount:
+            type: integer
+            description: number in cents
+          direction:
+            type: string
+            description: more or less
+            enum: 
+            - addition
+            - subtraction
   TransactionChange :
     type: object
     properties:
